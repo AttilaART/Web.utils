@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/assets/pico-main/css/pico.css">
+  <script src="/assets/htmx/htmx.min.js"></script>
+</head>
+
+<body class="container">
+  <div class="main-div">
+    <h2>Invalid File</h2>
+    <code>
+      {{.Message}}
+    </code> <br>
+    <a hx-boost="true" href="{{.Retry}}">Retry</a>
+  </div>
+</body>
+
+
+</html>
+
+<style>
+  .main-div {
+    padding: 20px;
+  }
+</style>

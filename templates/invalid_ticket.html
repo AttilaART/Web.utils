@@ -1,0 +1,29 @@
+<dialog open>
+  <script>
+    invalid_beep.play();
+  </script>
+  <article>
+    <header>
+      <h2 style="color: var(--red)">Invalid Ticket</h2>
+    </header>
+    <p>Sorry, we were unable to find a ticket matching this code!</p>
+    <footer>
+      <progress id="spinner_ticket" class="htmx-indicator"></progress>
+      <div role="group">
+        <button
+          class="primary"
+          type="button"
+          style="margin-top: 0; margin-bottom: 0; flex: 1 1 40%"
+          hx-trigger="click, keyup[key=='Enter']"
+          hx-on:click="ignore_scan=false;"
+          hx-post="/ticket_checker/ls"
+          hx-target="#result"
+          hx-swap="innerhtml"
+          hx-indicator="#spinner_ticket"
+        >
+          <strong>Scan new</strong>
+        </button>
+      </div>
+    </footer>
+  </article>
+</dialog>
