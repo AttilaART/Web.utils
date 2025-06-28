@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/assets/pico-main/css/pico.css">
+  <script src="/assets/htmx/htmx.min.js"></script>
+</head>
+
+<body class="container">
+
+  <script>
+    htmx.onLoad(() => {
+      console.log("Redirecting")
+      setTimeout(() => {
+        window.location = "{{.Url}}"
+      }, 500);
+    })
+  </script>
+
+
+  <div class="main-div">
+    <h2>Redirecting...</h2>
+    <small>If the page doesn't reload in a few seconds click <a href="{{.Url}}">here</a></small>
+  </div>
+</body>
+
+
+</html>
+
+<style>
+  .main-div {
+    padding: 20px;
+  }
+</style>

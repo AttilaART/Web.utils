@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/assets/pico-main/css/pico.css">
+  <script src="/assets/htmx/htmx.min.js"></script>
+</head>
+
+<body class="container">
+  <div class="main-div">
+    <h2>Authorise</h2>
+    <form action="/ticket_checker/authorise" method="post" hx-boost="true">
+      <fieldset role="group">
+        <input type="text" name="access_key" value="" placeholder="enter access key" hx-trigger="click[enter]">
+        <input type="submit" value="Check">
+      </fieldset>
+    </form>
+
+    {{if .}}
+    <p>Incorrect access key</p>
+    {{end}}
+
+  </div>
+</body>
+
+
+</html>
+
+<style>
+  .main-div {
+    padding: 20px;
+  }
+</style>

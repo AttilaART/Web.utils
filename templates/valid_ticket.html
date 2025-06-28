@@ -1,0 +1,121 @@
+<script>
+  ignore_scan = true;
+</script>
+
+<dialog open>
+  <article>
+    <header>
+      <h2 style="color: var(--green)">Ticket Valid</h2>
+    </header>
+
+    {{if .Ret_marked_automatically}}
+    <script>
+     two_beep.play();
+    </script>
+    <p>
+      <strong>{{.Person.Name}}</strong> has automatically been recorded as
+      having boarded (return).
+    </p>
+    {{else if .Dep_marked_automatically}}
+    <script>
+     one_beep.play();
+    </script>
+    <p>
+      <strong>{{.Person.Name}}</strong> has automatically been recorded as
+      having boarded (departure).
+    </p>
+    {{end}}
+
+    {{if or .Ret_marked_automatically .Dep_marked_automatically}}
+
+    <details>
+      <summary>Details</summary>
+      {{end}}
+      <table>
+        <tbody>
+          <tr>
+            <td>Name</td>
+            <td>{{.Person.Name}}</td>
+          </tr>
+
+          <tr>
+            <td>Class</td>
+            <td>{{.Person.Class}}</td>
+          </tr>
+
+          <tr>
+            <td>Coach</td>
+            <td>{{.Person.Coach}}</td>
+          </tr>
+
+          <tr>
+            <td>Ticket</td>
+            <td><samp>{{.Person.Ticket_number}}</samp></td>
+          </tr>
+
+          <tr>
+            <td>Boarded (dearture)</td>
+            {{if .Person.Boarded_dep}}<td style="color: var(--green);"><strong>Yes{{else}}
+            <td style="color: var(--red);"><strong>No{{end}}</strong></td>
+          </tr>
+
+          <tr>
+            <td>Boarded (return)</td>
+            {{if .Person.Boarded_ret}}<td style="color: var(--green);"><strong>Yes{{else}}
+            <td style="color: var(--red);"><strong>No{{end}}</strong></td>
+          </tr>
+
+          <tr>
+            <td>Phone number</td>
+            <td>{{.Person.Phone_number}}</td>
+          </tr>
+
+          <tr>
+            <td>Email</td>
+            <td>{{.Person.Email}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {{if or .Ret_marked_automatically .Dep_marked_automatically}}
+    </details>
+    {{end}}
+
+    <footer>
+      <progress id="spinner_ticket" class="htmx-indicator"></progress>
+      <div role="group">
+        {{if .Person.Boarded_dep}}
+        <button class="outline secondary" type="button" hx-post="/ticket_checker/revert_boarding" hx-target="#result"
+          hx-swap="innerHTML" hx-vars='{"ticket_number": "{{.Person.Ticket_number}}", "Boarded_dep": false}'
+          hx-indicator="#spinner_ticket">
+          Unboard (departure)
+        </button>
+        {{else}}
+        <button class="secondary" type="button" hx-post="/ticket_checker/revert_boarding" hx-target="#result"
+          hx-swap="innerHTML" hx-vars='{"ticket_number": "{{.Person.Ticket_number}}", "Boarded_dep": true}'
+          hx-indicator="#spinner_ticket">
+          Set Boarded (departure)
+        </button>
+        {{end}} {{if .Person.Boarded_ret}}
+        <button class="outline secondary" type="button" hx-post="/ticket_checker/revert_boarding" hx-target="#result"
+          hx-swap="innerHTML" hx-vars='{"ticket_number": "{{.Person.Ticket_number}}", "Boarded_ret": false}'
+          hx-indicator="#spinner_ticket">
+          Unboard (return)
+        </button>
+        {{else}}
+        <button class="secondary" type="button" hx-post="/ticket_checker/revert_boarding" hx-target="#result"
+          hx-swap="innerHTML" hx-vars='{"ticket_number": "{{.Person.Ticket_number}}", "Boarded_ret": true}'
+          hx-indicator="#spinner_ticket">
+          Set Boarded (return)
+        </button>
+        {{end}}
+      </div>
+      <div role="group">
+        <button class="primary" type="button" hx-on:click="ignore_scan=false;" hx-post="/ticket_checker/ls"
+          hx-target="#result" hx-swap="innerhtml" hx-indicator="#spinner_ticket">
+          <strong>Scan new</strong>
+        </button>
+      </div>
+    </footer>
+  </article>
+</dialog>

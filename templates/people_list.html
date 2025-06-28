@@ -1,0 +1,98 @@
+<script>
+  ignore_scan = false;
+</script>
+
+{{if not .Only_data}}
+<h3>↓Participants</h3>
+<form id="search_form" hx-post="/ticket_checker/ls/search" hx-trigger="change, click[key=='Enter'], keyup"
+  hx-target="#table-data" hx-indicator="#spinner_search" hx-swap="outerHTML"
+  hx-on:beforeRequest="htmx.trigger('#search_form', 'htmx:abort')">
+
+  <fieldset>
+    <label for="filter_dep">Departure</label>
+    <select name="filter_dep">
+      <option value="none">None</option>
+      <option value="true">Has Boarded</option>
+      <option value="false">Has not Boarded</option>
+    </select>
+
+    <label for="filter_ret">Return</label>
+    <select name="filter_ret">
+      <option value="none">None</option>
+      <option value="true">Has Boarded</option>
+      <option value="false">Has not Boarded</option>
+    </select>
+  </fieldset>
+
+  <fieldset>
+    <label for="coach">Coach</label>
+    <select name="coach">
+      <option value="">All</option>
+      {{range .Coaches}}
+      <option value="{{.}}">{{.}}</option>
+      {{end}}
+    </select>
+
+    <label for="class">Class</label>
+    <select name="class">
+      <option value="">All</option>
+      {{range .Classes}}
+      <option value="{{.}}">{{.}}</option>
+      {{end}}
+    </select>
+
+    <label for="is_staff">Is staff?</label>
+    <select name="is_staff">
+      <option value="none">None</option>
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </fieldset>
+
+  <input type="search" name="search_name" value="" placeholder="Search" onkeydown="return event.key != 'Enter';" />
+</form>
+
+{{end}}
+
+<div style="position: relative" id="table-data">
+  <progress id="spinner_search" class="htmx-indicator"></progress>
+  <small>{{len .People}} entries found.</small>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Ticket</th>
+        <th>Class</th>
+        <th>Coach</th>
+        <th>Boarded (departure)?</th>
+        <th>Boarded (return)?</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .People}}
+      <tr>
+        <td>
+          {{.Name}}{{if .Is_staff}}
+          <strong style="color: var(--yellow)">[Staff]</strong>{{end}}
+        </td>
+        <td>
+          <samp>
+            <a hx-post="/ticket_checker/validate" hx-target="#result" hx-indicator="#spinner_result"
+              hx-vals='{"ticket_number": "{{.Ticket_number}}", "auto_board_disable": "true"}'>{{.Ticket_number}}</a></samp>
+        </td>
+        <td>{{.Class}}</td>
+        <td>{{.Coach}}</td>
+        {{if .Boarded_dep}}<td style="color: var(--green);"><strong>Yes{{else}}
+        <td style="color: var(--red);"><strong>No{{end}}</strong></td>
+        {{if .Boarded_ret}}<td style="color: var(--green);"><strong>Yes{{else}}
+        <td style="color: var(--red);"><strong>No{{end}}</strong></td>
+      </tr>
+      {{end}} {{if not .List_complete}}
+      <tr>
+        <td>More</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>

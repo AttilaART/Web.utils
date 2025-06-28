@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link rel="stylesheet" href="/assets/pico-main/css/pico.css" />
+    <script src="/assets/htmx/htmx.min.js"></script>
+    <script>
+      let qrScanner;
+      let ignore_scan = false;
+      import("/assets/qr-scanner-master/qr-scanner.min.js").then((module) => {
+        const QrScanner = module.default;
+
+        function load_camera() {
+          qrScanner = new QrScanner(
+            document.getElementById("scanner"),
+            onScanSuccess,
+            {
+              returnDetailedScanResult: true,
+              highlightScanRegion: true,
+              overlay: document.getElementById("overlay"),
+            },
+          );
+          qrScanner.setCamera("environment");
+          qrScanner.start().catch((reason) => {
+            let error_div = document.createElement("div");
+            error_div.setAttribute("id", "error_div");
+            let error_message = document.createElement("h3");
+            error_message.innerHTML = `Failed to detect camera: ${reason}`;
+            let retry = document.createElement("button");
+            retry.innerHTML = "Try again";
+            retry.addEventListener("click", () => {
+              load_camera();
+              document.getElementById("error_div").remove();
+            });
+            error_div.append(error_message);
+            error_div.append(retry);
+            document.getElementById("reader-container").prepend(error_div);
+          });
+        }
+
+        load_camera();
+      });
+
+      function onScanSuccess(result) {
+        let code = result.data.replaceAll('"', "");
+        console.log("code scanned!");
+        console.log(ignore_scan);
+        // handle the scanned code as you like, for example:
+
+        if (!ignore_scan) {
+          ignore_scan = true;
+          let spinner_result = document.getElementById("spinner_result");
+          spinner_result.setAttribute("class", "");
+
+          htmx
+            .ajax("post", "/ticket_checker/validate", {
+              values: {
+                ticket_number: code,
+                auto_board_disable:
+                  document.getElementById("auto_board_disable").checked,
+              },
+              target: "#result",
+            })
+            .then(() => {
+              spinner_result.setAttribute("class", "htmx-indicator");
+            });
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        htmx.ajax("post", "/ticket_checker/ls", {
+          target: "#result",
+          swap: "innerHTML",
+        });
+      });
+
+      // window.addEventListener("load", () => { });
+
+      // beeps
+      const one_beep = new Audio("/assets/Sounds/boarded_departure.mp3");
+      const two_beep = new Audio("/assets/Sounds/boarded_return.mp3");
+      const invalid_beep = new Audio("/assets/Sounds/invalid_ticket.mp3");
+    </script>
+  </head>
+
+  <body class="container">
+    <div class="reader-container" id="reader-container">
+      <video id="scanner"></video>
+      <div id="overlay">
+        <div class="overlay-corner" style="top: -4.8rem; left: -1.8rem">⌜</div>
+        <div class="overlay-corner" style="top: -4.8rem; right: -1.8rem">⌝</div>
+        <div class="overlay-corner" style="bottom: -4.5rem; left: -1.8rem">
+          ⌞
+        </div>
+        <div class="overlay-corner" style="bottom: -4.5rem; right: -1.8rem">
+          ⌟
+        </div>
+      </div>
+      <form
+        hx-on:submit='ignore_scan=true; document.getElementById("manual_input").blur()'
+        hx-post="/ticket_checker/validate"
+        hx-target="#result"
+        hx-indicator="#spinner_result"
+      >
+        <input
+          id="manual_input"
+          type="text"
+          name="ticket_number"
+          value=""
+          placeholder="Or manually enter a code"
+        />
+
+        <label>
+          <input
+            id="auto_board_disable"
+            type="checkbox"
+            name="auto_board_disable"
+            value="true"
+            role="switch"
+          />
+          Don't automatically mark as boarded</label
+        >
+      </form>
+      <progress id="spinner_result" class="htmx-indicator"></progress>
+    </div>
+
+    <div id="result"></div>
+
+    <a href="/ticket_checker/ls/import">Import CSV</a>
+    <a href="/ticket_checker/ls/export">Export CSV</a>
+
+    <footer>Made by Attila Pinter for Schülerorganisation Im Lee</footer>
+  </body>
+</html>
+
+<style>
+  .loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #fff;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  #scanner {
+    display: block;
+    width: 100%;
+    border-color: var(--pico-border-color);
+    border-width: 0.0625rem;
+    border-radius: var(--pico-border-radius);
+    margin-bottom: var(--pico-spacing);
+  }
+
+  #overlay {
+    position: relative;
+    font-size: 10rem;
+  }
+
+  .overlay-corner {
+    position: absolute;
+  }
+
+  .reader-container {
+    padding: 40px;
+    min-height: calc(100vh - 80px - 10px);
+  }
+
+  /*body {
+    max-width: 1000px;
+    margin: auto;
+  }*/
+
+  #result {
+    padding: 40px;
+  }
+
+  table {
+    overflow-y: scroll;
+    display: block;
+    max-width: 100%;
+  }
+
+  body {
+    --yellow: rgba(235, 149, 0, 1);
+    --red: rgba(205, 25, 25, 1);
+    --green: rgba(25, 205, 25, 1);
+  }
+</style>

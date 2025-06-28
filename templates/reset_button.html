@@ -1,0 +1,5 @@
+{{define "reset-button"}}
+<button class="primary" type="button" style="margin-top: 0; margin-bottom: 0; flex: 1 1 40%"
+  hx-on:click="ignore_scan=false;" hx-post="/ticket_checker/ls" hx-target="#result" hx-swap="innerhtml"
+  hx-indicator="#spinner"><strong>Scan new</strong></button>
+{{end}}

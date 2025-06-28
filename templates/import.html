@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/assets/pico-main/css/pico.css">
+  <script src="/assets/htmx/htmx.min.js"></script>
+</head>
+
+<body class="container">
+  <div class="main-div">
+    <h2>Import CSV</h2>
+    <form action="/ticket_checker/ls/import" method="post" hx-boost="true" enctype="multipart/form-data"
+      hx-indicator="#loading" onsubmit="return confirm('Are you sure you want to reset the database?')">
+      <fieldset role="group">
+        <input type="file" name="csv" value="">
+        <input type="submit">
+      </fieldset>
+    </form>
+    <progress id="loading" class="htmx-indicator"></id>
+  </div>
+</body>
+
+
+</html>
+
+<style>
+  .main-div {
+    padding: 20px;
+  }
+</style>
