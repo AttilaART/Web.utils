@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"text/template"
@@ -23,6 +24,7 @@ type Ticket_info struct {
 	Ticket_number string
 	Coach_number  string
 	Has_ep_ticket bool
+	Is_staff      bool
 	Date          string
 	Year          string
 }
@@ -107,8 +109,11 @@ func make_ticket(person Ticket_info, qr_path string, cairo_path string, template
 		log.Panic(err)
 	}
 
-	err = exec.Command(cairo_path, ticket_path+".svg", "-f", "pdf", "-o", ticket_path+".pdf").Run()
+	cmd_converter := exec.Command(cairo_path, ticket_path+".svg", "-f", "pdf", "-o", ticket_path+".pdf")
+
+	output, err := cmd_converter.CombinedOutput()
 	if err != nil {
+		log.Println(string(output))
 		log.Panic(err)
 	}
 
@@ -195,6 +200,11 @@ func main() {
 				person.Name = cases.Title(language.German).String(column_data)
 			case "Ticket_number", "ticket_number":
 				person.Ticket_number = column_data
+			case "Is_staff", "is_staff":
+				person.Is_staff, err = strconv.ParseBool(column_data)
+				if err != nil {
+					log.Panic(err)
+				}
 			case "Has_ep_ticket", "has_ep_ticket":
 				if column_data == "1" {
 					person.Has_ep_ticket = true

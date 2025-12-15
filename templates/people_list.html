@@ -9,23 +9,25 @@
   hx-on:beforeRequest="htmx.trigger('#search_form', 'htmx:abort')">
 
   <fieldset>
-    <label for="filter_dep">Departure</label>
+    <label for="filter_dep">Presence</label>
     <select name="filter_dep">
       <option value="none">None</option>
-      <option value="true">Has Boarded</option>
-      <option value="false">Has not Boarded</option>
+      <option value="true">Is Present</option>
+      <option value="false">Is not present</option>
     </select>
 
+    <!--
     <label for="filter_ret">Return</label>
     <select name="filter_ret">
       <option value="none">None</option>
       <option value="true">Has Boarded</option>
       <option value="false">Has not Boarded</option>
     </select>
+    -->
   </fieldset>
 
   <fieldset>
-    <label for="coach">Coach</label>
+    <label for="coach">Team</label>
     <select name="coach">
       <option value="">All</option>
       {{range .Coaches}}
@@ -63,9 +65,9 @@
         <th>Name</th>
         <th>Ticket</th>
         <th>Class</th>
-        <th>Coach</th>
-        <th>Boarded (departure)?</th>
-        <th>Boarded (return)?</th>
+        <th>Team</th>
+        <th>Present?</th>
+        <!--<th>Boarded (return)?</th>-->
         <th></th>
       </tr>
     </thead>
@@ -74,7 +76,7 @@
       <tr>
         <td>
           {{.Name}}{{if .Is_staff}}
-          <strong style="color: var(--yellow)">[Staff]</strong>{{end}}
+          <strong style="color: var(--yellow)">[Helper]</strong>{{end}}
         </td>
         <td>
           <samp>
@@ -85,8 +87,8 @@
         <td>{{.Coach}}</td>
         {{if .Boarded_dep}}<td style="color: var(--green);"><strong>Yes{{else}}
         <td style="color: var(--red);"><strong>No{{end}}</strong></td>
-        {{if .Boarded_ret}}<td style="color: var(--green);"><strong>Yes{{else}}
-        <td style="color: var(--red);"><strong>No{{end}}</strong></td>
+        {{if .Boarded_ret}}<td style="color: var(--green); visibility: hidden;"><strong>Yes{{else}}
+        <td style="color: var(--red);visibility: hidden;"><strong>No{{end}}</strong></td>
       </tr>
       {{end}} {{if not .List_complete}}
       <tr>
